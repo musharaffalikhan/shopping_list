@@ -18,10 +18,14 @@ class _NewItemState extends State<NewItem> {
   var enteredName = "";
   var enteredQuantity = 1;
   var selectedCategory = categories[Categories.vegetables]!;
+  var isSending = false;
 
   void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      setState(() {
+        isSending = true;
+      });
       final url = Uri.https(
           'shopping-list-flutter-98463-default-rtdb.firebaseio.com',
           'shopping-list.json');
@@ -36,12 +40,17 @@ class _NewItemState extends State<NewItem> {
           },
         ),
       );
-      print(response.body);
-      print(response.statusCode);
+      final Map<String, dynamic> resData = json.decode(response.body);
       if (!context.mounted) {
         return;
       }
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(
+        GroceryItem(
+            id: resData['name'],
+            name: enteredName,
+            category: selectedCategory,
+            quantity: enteredQuantity),
+      );
     }
   }
 
@@ -145,9 +154,18 @@ class _NewItemState extends State<NewItem> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: _reset, child: const Text("Reset")),
+                  TextButton(
+                      onPressed: isSending ? null : _reset,
+                      child: const Text("Reset")),
                   ElevatedButton(
-                      onPressed: _saveItem, child: const Text("Add Expense"))
+                      onPressed: isSending ? null : _saveItem,
+                      child: isSending
+                          ? const SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Text("Add Expense"))
                 ],
               )
             ],
