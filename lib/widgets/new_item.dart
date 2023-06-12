@@ -26,7 +26,15 @@ class _NewItemState extends State<NewItem> {
                 decoration: const InputDecoration(
                   label: Text("Name"),
                 ),
-                validator: (value) {},
+                validator: (value) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.trim().length <= 1 ||
+                      value.length > 50) {
+                    return "Must be between 1 to 50 characters long.";
+                  }
+                  return null;
+                },
               ),
               const SizedBox(
                 height: 16,
@@ -41,7 +49,15 @@ class _NewItemState extends State<NewItem> {
                       ),
                       initialValue: "1",
                       keyboardType: TextInputType.number,
-                      validator: (value) {},
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            int.tryParse(value) == null ||
+                            int.tryParse(value)! <= 0) {
+                          return "Must be a valid positive number";
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(
